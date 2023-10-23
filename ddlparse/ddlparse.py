@@ -543,7 +543,7 @@ class DdlParseTable(DdlParseTableColumnBase):
                 not_null = " NOT NULL" if col.not_null else ""
                 default_column = ""
                 if col.default:
-                    default_column = " DEFAULT " + f"'{col.default}'" if type != 'NUMERIC' else f"{col.default}"
+                    default_column = f" DEFAULT '{col.default}'" if type == 'STRING' else f" DEFAULT {col.default}"
                 length = ""
                 if use_length:
                     length = f"({col.length})" if (col.length is not None and str(col.length).isdigit()) else ""
