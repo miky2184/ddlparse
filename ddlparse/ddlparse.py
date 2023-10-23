@@ -512,7 +512,7 @@ class DdlParseTable(DdlParseTableColumnBase):
 
         return self._columns.to_bigquery_fields(name_case)
 
-    def to_bigquery_ddl(self, name_case=DdlParseBase.NAME_CASE.original, project="project", use_length=False, use_default=False):
+    def to_bigquery_ddl(self, name_case=DdlParseBase.NAME_CASE.original, project="project", use_length=False):
         """
         Generate BigQuery CREATE TABLE statements
 
@@ -541,14 +541,12 @@ class DdlParseTable(DdlParseTableColumnBase):
                 # no array data type
                 type = col.bigquery_standard_data_type
                 not_null = " NOT NULL" if col.not_null else ""
+                default_column = ""
+                if col.default:
+                    default_column = " DEFAULT " + f"'{col.default}'" if type != 'NUMERIC' else f"{col.default}"
                 length = ""
                 if use_length:
                     length = f"({col.length})" if (col.length is not None and str(col.length).isdigit()) else ""
-
-                default_column = ""
-                if use_default:
-                    default_value = f"'{col.default}'" if col.bigquery_standard_data_type != 'NUMERIC' else f"{col.default}"
-                    default_column = f" DEFAULT {default_value}" if col.default is not None else ""
 
             else:
                 # one or multiple dimensional array data type
