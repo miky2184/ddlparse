@@ -287,18 +287,18 @@ class DdlParseColumn(DdlParseTableColumnBase):
 
         # BigQuery data type = {source_database: [data type, ...], ...}
         BQ_DATA_TYPE_DIC = OrderedDict()
-        BQ_DATA_TYPE_DIC["STRING"] = {None: [re.compile(r"(STRING|CHAR|TEXT|CLOB|JSON|UUID|ROWID)")]}
+        BQ_DATA_TYPE_DIC["STRING"] = {None: [re.compile(r"(STRING|CHAR|TEXT|CLOB|JSON|UUID|ROWID|BFILE)")]}
         BQ_DATA_TYPE_DIC["INTEGER"] = {None: [re.compile(r"INT|SERIAL|YEAR")]}
         BQ_DATA_TYPE_DIC["FLOAT"] = {None: [re.compile(r"(FLOAT|DOUBLE)"), "REAL", "MONEY"]}
         BQ_DATA_TYPE_DIC["DATETIME"] = {
             None: ["DATETIME", "TIMESTAMP", "TIMESTAMP WITHOUT TIME ZONE"],
             self.DATABASE.oracle: ["DATE"]
         }
-        BQ_DATA_TYPE_DIC["TIMESTAMP"] = {None: ["TIMESTAMPTZ", "TIMESTAMP WITH TIME ZONE"]}
+        BQ_DATA_TYPE_DIC["TIMESTAMP"] = {None: ["TIMESTAMPTZ", "TIMESTAMP WITH TIME ZONE", "TIMESTAMP WITH LOCAL TIME ZONE"]}
         BQ_DATA_TYPE_DIC["DATE"] = {None: ["DATE"]}
-        BQ_DATA_TYPE_DIC["TIME"] = {None: ["TIME"]}
+        BQ_DATA_TYPE_DIC["TIME"] = {None: ["TIME", "TIME WITHOUT TIME ZONE"]}
         BQ_DATA_TYPE_DIC["BOOLEAN"] = {None: [re.compile(r"BOOL")]}
-        BQ_DATA_TYPE_DIC["BYTES"] = {None: ["BYTES", "BINARY", "VARBINARY", "BYTEA", "RAW", "LONG"]}
+        BQ_DATA_TYPE_DIC["BYTES"] = {None: ["BYTES", "BINARY", "VARBINARY", "BYTEA", "RAW", "LONG", "LONG RAW", "BLOB"]}
 
         for bq_type, conditions in BQ_DATA_TYPE_DIC.items():
             for source_db, source_datatypes in conditions.items():
