@@ -512,7 +512,7 @@ class DdlParseTable(DdlParseTableColumnBase):
 
         return self._columns.to_bigquery_fields(name_case)
 
-    def to_bigquery_ddl(self, name_case=DdlParseBase.NAME_CASE.original, project="project", use_length=False, use_default=False):
+    def to_bigquery_ddl(self, name_case=DdlParseBase.NAME_CASE.original, project="project", use_length=False, use_default=False, schema_name=None):
         """
         Generate BigQuery CREATE TABLE statements
 
@@ -531,7 +531,10 @@ class DdlParseTable(DdlParseTableColumnBase):
         elif name_case == self.NAME_CASE.upper:
             dataset = self.schema.upper()
         else:
-            dataset = self.schema
+            if schema_name is not None:
+                dataset = schema_name
+            else:
+                dataset = self.schema
 
         cols_defs = []
         for col in self.columns.values():
