@@ -526,15 +526,17 @@ class DdlParseTable(DdlParseTableColumnBase):
 
         if self.schema is None:
             dataset = "dataset"
-        elif name_case == self.NAME_CASE.lower:
-            dataset = self.schema.lower()
-        elif name_case == self.NAME_CASE.upper:
-            dataset = self.schema.upper()
         else:
             if schema_name is not None:
-                dataset = schema_name
+                if name_case == self.NAME_CASE.lower:
+                    dataset = schema_name.lower()
+                elif name_case == self.NAME_CASE.upper:
+                    dataset = schema_name.upper()
             else:
-                dataset = self.schema
+                if name_case == self.NAME_CASE.lower:
+                    dataset = self.schema.lower()
+                elif name_case == self.NAME_CASE.upper:
+                    dataset = self.schema.upper()
 
         cols_defs = []
         for col in self.columns.values():
