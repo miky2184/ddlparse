@@ -404,9 +404,10 @@ class DdlParseColumn(DdlParseTableColumnBase):
         col['name'] = col_name
         col['type'] = type
         col['mode'] = mode
-        col['defaultValueExpression'] = default_value
-        if max_length:
-            col['maxLength'] = max_length
+        if default_value is not None and list(default_value)[0] is not None:
+            col['defaultValueExpression'] = '{}'.format(list(default_value)[0])
+        if max_length is not None and list(max_length)[0] is not None:
+            col['maxLength'] = '{}'.format(list(max_length)[0])
         if self.description is not None:
             col['description'] = self.description
         if self.array_dimensional > 1:
