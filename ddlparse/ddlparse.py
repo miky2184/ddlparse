@@ -367,11 +367,17 @@ class DdlParseColumn(DdlParseTableColumnBase):
         else:
             return "NULLABLE"
 
-    def to_bigquery_field(self, name_case=DdlParseBase.NAME_CASE.original):
+    def to_bigquery_field(self, name_case=DdlParseBase.NAME_CASE.original, use_length=False, use_default=False):
         """Generate BigQuery JSON field define"""
-
+        max_length = None
+        default_value = None
         col_name = self.get_name(name_case)
         mode = self.bigquery_mode
+
+        if use_default:
+            default_value = {self.default} if self.default is not None else None
+        if use_length:
+            max_length = {self.precision} if self.precision is not None else None
 
         if self.array_dimensional <= 1:
             # no or one dimensional array data type
@@ -398,6 +404,9 @@ class DdlParseColumn(DdlParseTableColumnBase):
         col['name'] = col_name
         col['type'] = type
         col['mode'] = mode
+        col['defaultValueExpression'] = default_value
+        if max_length:
+            col['maxLength'] = max_length
         if self.description is not None:
             col['description'] = self.description
         if self.array_dimensional > 1:
