@@ -442,7 +442,7 @@ class DdlParseColumnDict(OrderedDict, DdlParseBase):
         self.__setitem__(column_name, column)
         return column
 
-    def to_bigquery_fields(self, name_case=DdlParseBase.NAME_CASE.original):
+    def to_bigquery_fields(self, name_case=DdlParseBase.NAME_CASE.original, use_length=False, use_default=False):
         """
         Generate BigQuery JSON fields define
 
@@ -450,6 +450,8 @@ class DdlParseColumnDict(OrderedDict, DdlParseBase):
             * DdlParse.NAME_CASE.original : Return to no convert
             * DdlParse.NAME_CASE.lower : Return to lower
             * DdlParse.NAME_CASE.upper : Return to upper
+        :param use_length: use precision
+        :param use_default: use default
 
         :return: BigQuery JSON fields define
         """
@@ -457,7 +459,7 @@ class DdlParseColumnDict(OrderedDict, DdlParseBase):
         bq_fields = []
 
         for col in self.values():
-            bq_fields.append(col.to_bigquery_field(name_case))
+            bq_fields.append(col.to_bigquery_field(name_case, use_length, use_default))
 
         return "[{}]".format(",".join(bq_fields))
 
