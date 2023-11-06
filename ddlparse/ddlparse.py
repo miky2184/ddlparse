@@ -291,8 +291,7 @@ class DdlParseColumn(DdlParseTableColumnBase):
         BQ_DATA_TYPE_DIC["INTEGER"] = {None: [re.compile(r"INT|SERIAL|YEAR")]}
         BQ_DATA_TYPE_DIC["FLOAT"] = {None: [re.compile(r"(FLOAT|DOUBLE)"), "REAL", "MONEY"]}
         BQ_DATA_TYPE_DIC["DATETIME"] = {
-            None: ["DATETIME", "TIMESTAMP", "TIMESTAMP WITHOUT TIME ZONE"],
-            self.DATABASE.oracle: ["DATE"]
+            None: ["DATETIME", "TIMESTAMP", "TIMESTAMP WITHOUT TIME ZONE"]
         }
         BQ_DATA_TYPE_DIC["TIMESTAMP"] = {None: ["TIMESTAMPTZ", "TIMESTAMP WITH TIME ZONE", "TIMESTAMP WITH LOCAL TIME ZONE"]}
         BQ_DATA_TYPE_DIC["DATE"] = {None: ["DATE"]}
@@ -330,6 +329,9 @@ class DdlParseColumn(DdlParseTableColumnBase):
                     return "INTEGER"
                 else:
                     return "FLOAT"
+
+            if self._length > 29:
+                return "BIGNUMERIC"
 
             return "NUMERIC"
 
@@ -524,6 +526,17 @@ class DdlParseTable(DdlParseTableColumnBase):
 
         return self._columns.to_bigquery_fields(name_case, use_length, use_default)
 
+
+    def format_value(self, col):
+
+        if col.bigquery_data_type == 'DATETIME':
+            return 'current_datetime()'
+
+        if col.bigquery_data_type == 'DATE':
+            return 'current_date()'
+
+        return col.default
+
     def to_bigquery_ddl(self, name_case=DdlParseBase.NAME_CASE.original, project="project", use_length=False, use_default=False, schema_name=None):
         """
         Generate BigQuery CREATE TABLE statements
@@ -561,11 +574,11 @@ class DdlParseTable(DdlParseTableColumnBase):
 
                 default_column = ""
                 if use_default and col.default:
-                    default_column = f" DEFAULT '{col.default}'" if type == 'STRING' else f" DEFAULT {col.default}"
+                    default_column = f" DEFAULT '{self.format_value(col)}'" if type == 'STRING' else f" DEFAULT {self.format_value(col)}"
 
                 length = ""
                 if use_length:
-                    length = f"({col.length})" if (col.length is not None and str(col.length).isdigit()) else ""
+                    length = f"({col.length})" if (col.length is not None and str(col.length).isdigit() and col.bigquery_data_type not in ('FLOAT', 'DATETIME', 'INTEGER')) else ""
 
             else:
                 # one or multiple dimensional array data type
@@ -591,7 +604,7 @@ class DdlParseTable(DdlParseTableColumnBase):
         return textwrap.dedent(
             """\
             #standardSQL
-            CREATE TABLE `{project}.{dataset}.{table}`
+            CREATE TABLE IF NOT EXISTS `{project}.{dataset}.{table}`
             (
               {colmns_define}
             )""").format(
