@@ -322,7 +322,7 @@ class DdlParseColumn(DdlParseTableColumnBase):
                     return "INTEGER"
 
             if self._length == "*":
-                return "NUMERIC"
+                return "BIGNUMERIC"
 
             if self._length < 19:
                 if self._scale is None or self._scale == 0:
