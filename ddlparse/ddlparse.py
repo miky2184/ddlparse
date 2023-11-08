@@ -317,7 +317,7 @@ class DdlParseColumn(DdlParseTableColumnBase):
         if self._data_type in ["NUMERIC", "NUMBER", "DECIMAL", "DEC", "FIXED"]:
             if self._length is None:
                 if self._source_database in [self.DATABASE.oracle, self.DATABASE.postgresql]:
-                    return "NUMERIC"
+                    return "BIGNUMERIC"
                 else:
                     return "INTEGER"
 
@@ -333,7 +333,7 @@ class DdlParseColumn(DdlParseTableColumnBase):
             if self._length > 29:
                 return "BIGNUMERIC"
 
-            return "NUMERIC"
+            return "BIGNUMERIC"
 
         raise ValueError("Unknown data type : '{}'".format(self._data_type))
 
