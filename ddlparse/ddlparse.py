@@ -527,17 +527,17 @@ class DdlParseTable(DdlParseTableColumnBase):
         return self._columns.to_bigquery_fields(name_case, use_length, use_default)
 
 
-    def format_value(self, col):
+    def format_value(self, col, timezone):
 
         if col.bigquery_data_type == 'DATETIME':
-            return 'current_datetime()'
+            return f"current_datetime('{timezone}')"
 
         if col.bigquery_data_type == 'DATE':
-            return 'current_date()'
+            return f"current_date('{timezone}')"
 
         return col.default
 
-    def to_bigquery_ddl(self, name_case=DdlParseBase.NAME_CASE.original, project="project", use_length=False, use_default=False, schema_name=None):
+    def to_bigquery_ddl(self, name_case=DdlParseBase.NAME_CASE.original, project="project", use_length=False, use_default=False, schema_name=None, use_timezone='UTC'):
         """
         Generate BigQuery CREATE TABLE statements
 
@@ -574,7 +574,7 @@ class DdlParseTable(DdlParseTableColumnBase):
 
                 default_column = ""
                 if use_default and col.default:
-                    default_column = f" DEFAULT '{self.format_value(col)}'" if type == 'STRING' else f" DEFAULT {self.format_value(col)}"
+                    default_column = f" DEFAULT '{self.format_value(col, use_timezone)}'" if type == 'STRING' else f" DEFAULT {self.format_value(col)}"
 
                 length = ""
                 if use_length:
