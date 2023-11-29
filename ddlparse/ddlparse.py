@@ -574,7 +574,7 @@ class DdlParseTable(DdlParseTableColumnBase):
 
                 default_column = ""
                 if use_default and col.default:
-                    default_column = f" DEFAULT '{self.format_value(col, use_timezone)}'" if type == 'STRING' else f" DEFAULT {self.format_value(col)}"
+                    default_column = f" DEFAULT '{self.format_value(col, use_timezone)}'" if type == 'STRING' else f" DEFAULT {self.format_value(col, use_timezone)}"
 
                 length = ""
                 if use_length:
